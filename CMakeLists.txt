@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 # ------------------------------------------------------------
 
 # -------------------- Dependencies --------------------------
-find_package(Vulkan COMPONENTS glslc)
+find_package(Vulkan)
 
 # if Vulkan not found prompt the user to install it
 if (NOT Vulkan_FOUND)
