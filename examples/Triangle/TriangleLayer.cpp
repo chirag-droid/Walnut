@@ -23,8 +23,13 @@ void TriangleLayer::OnDetach() {
 void TriangleLayer::OnUIRender() {
     // Settings View
     ImGui::Begin("Settings");
+    ImGui::ColorEdit3("Clear color", m_ClearColor);
     ImGui::Text("Last render: %.3fms", m_LastRenderTime);
-    ImGui::ColorPicker3("Clear color:", m_ClearColor);
+    ImGui::Text(
+        "Application average: %.3fms/frame (%.1f FPS)",
+        1000.0f / ImGui::GetIO().Framerate,
+        ImGui::GetIO().Framerate);
+
     ImGui::End();
 
     // Main Viewport

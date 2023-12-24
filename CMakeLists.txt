@@ -3,12 +3,14 @@ cmake_minimum_required(VERSION 3.16)
 # -------------------- Base Project Setup --------------------
 project(Walnut VERSION 0.1 DESCRIPTION "A fork of StudioCherno/Walnut application framework")
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake" ${CMAKE_MODULE_PATH})
 
 set(CMAKE_CXX_STANDARD_REQUIRED 17)
 set(CMAKE_CXX_STANDARD 17)
+# ------------------------------------------------------------
 
-find_package(Vulkan)
+# -------------------- Dependencies --------------------------
+find_package(Vulkan COMPONENTS glslc)
 
 # if Vulkan not found prompt the user to install it
 if (NOT Vulkan_FOUND)
@@ -22,6 +24,7 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "Build the GLFW documentation" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "Generate installation target" FORCE)
 add_subdirectory(vendor/glfw EXCLUDE_FROM_ALL)
 
+# glm
 add_subdirectory(vendor/glm EXCLUDE_FROM_ALL)
 
 # Dear ImGui

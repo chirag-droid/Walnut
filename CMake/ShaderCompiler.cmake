@@ -4,6 +4,11 @@
 find_package(Vulkan COMPONENTS glslc)
 find_program(glslc_executable NAMES glslc HINTS Vulkan::glslc)
 
+#if (NOT Vulkan_glslc_FOUND)
+#    message(WARNING "Check your Vulkan SDK installation. glslc is installed by default")
+#    message(FATAL_ERROR "Please install shaderc to compile shaders.")
+#endif()
+
 function(compile_shader target)
     cmake_parse_arguments(PARSE_ARGV 1 arg "" "ENV;FORMAT" "SOURCES")
     foreach(source ${arg_SOURCES})
