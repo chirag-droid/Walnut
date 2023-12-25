@@ -13,3 +13,21 @@
 [submodule "vendor/glm"]
 	path = vendor/glm
 	url = https://github.com/g-truc/glm.git
+[submodule "vendor/vulkan"]
+	path = vendor/vulkan
+	url = https://github.com/KhronosGroup/Vulkan-Headers
+[submodule "vendor/volk"]
+	path = vendor/volk
+	url = https://github.com/zeux/volk.git
+[submodule "vendor/shaderc"]
+	path = vendor/shaderc
+	url = https://github.com/google/shaderc
+[submodule "vendor/spirv-headers"]
+	path = vendor/spirv-headers
+	url = https://github.com/KhronosGroup/SPIRV-Headers
+[submodule "vendor/spirv-tools"]
+	path = vendor/spirv-tools
+	url = https://github.com/KhronosGroup/SPIRV-Tools
+[submodule "vendor/glslang"]
+	path = vendor/glslang
+	url = https://github.com/KhronosGroup/glslang

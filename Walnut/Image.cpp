@@ -61,7 +61,7 @@ namespace Walnut {
             info.mipLevels = 1;
             info.arrayLayers = 1;
             info.samples = VK_SAMPLE_COUNT_1_BIT;
-            info.tiling = VK_IMAGE_TILING_OPTIMAL; 
+            info.tiling = VK_IMAGE_TILING_OPTIMAL;
             info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
             err = vkCreateImage(device, &info, nullptr, &m_Image);
             CheckVkResult(err);
