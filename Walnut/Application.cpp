@@ -3,12 +3,12 @@
 #include "Walnut/Application.h"
 #include "logging.h"
 
-#include "backends/imgui_impl_glfw.h"
-#include "backends/imgui_impl_vulkan.h"
+#include "volk.h"
 #define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
-#include <vulkan/vulkan.h>
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_vulkan.h"
 #include <glm/glm.hpp>
 
 #include <map>
@@ -29,7 +29,7 @@ extern bool g_ApplicationRunning;
 #endif
 
 //#define IMGUI_UNLIMITED_FRAME_RATE
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(WALNUT_DEBUG_REPORT)
 #define WALNUT_DEBUG_REPORT
 #endif
 
@@ -46,10 +46,6 @@ struct SwapChainSupportDetails{
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
     std::vector<VkPresentModeKHR> presentModes;
-};
-
-const std::vector<const char*> g_ValidationLayers = {
-    "VK_LAYER_KHRONOS_validation"
 };
 
 const std::vector<const char*> g_DeviceExtensions = {
@@ -156,10 +152,8 @@ static void CreateVulkanInstance(std::vector<const char*> instanceExtensions)
     }
 #endif
 
-    // Enable validation layers
+    // Setup debug messenger callback
 #ifdef WALNUT_DEBUG_REPORT
-    createInfo.enabledLayerCount = (uint32_t)g_ValidationLayers.size();
-    createInfo.ppEnabledLayerNames = g_ValidationLayers.data();
     instanceExtensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 #endif
 
@@ -184,14 +178,13 @@ static void CreateVulkanInstance(std::vector<const char*> instanceExtensions)
 static void SetupDebugCallback()
 {
     // Setup the debug report callback
-    auto vkCreateDebugUtilsMessengerEXT = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(g_Instance, "vkCreateDebugUtilsMessengerEXT");
-    IM_ASSERT(vkCreateDebugUtilsMessengerEXT != nullptr);
     VkDebugUtilsMessengerCreateInfoEXT utilsMessengerCi = {};
     utilsMessengerCi.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
     utilsMessengerCi.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
     utilsMessengerCi.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
     utilsMessengerCi.pfnUserCallback = debugCallback;
     utilsMessengerCi.pUserData = nullptr;
+
     CheckVkResult(vkCreateDebugUtilsMessengerEXT(g_Instance, &utilsMessengerCi, g_Allocator, &g_DebugMessenger));
 }
 #endif
@@ -428,7 +421,6 @@ static void CleanupVulkan()
 
 #ifdef WALNUT_DEBUG_REPORT
     // Remove the debug report callback
-    auto vkDestroyDebugUtilsMessengerEXT = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(g_Instance, "vkDestroyDebugUtilsMessengerEXT");
     vkDestroyDebugUtilsMessengerEXT(g_Instance, g_DebugMessenger, g_Allocator);
 #endif // WALNUT_DEBUG_REPORT
 
@@ -609,7 +601,15 @@ namespace Walnut {
         for (uint32_t i = 0; i < extensions_count; i++)
             extensions.push_back(glfw_extensions[i]);
 
+        volkInitialize();
         CreateVulkanInstance(extensions);
+
+        ImGui_ImplVulkan_LoadFunctions([](const char* function_name, void* vulkan_instance) {
+            return vkGetInstanceProcAddr(*(reinterpret_cast<VkInstance*>(vulkan_instance)), function_name);
+        }, &g_Instance);
+
+        // Load Vulkan instance in volk
+        volkLoadInstance(g_Instance);
 
 #ifdef WALNUT_DEBUG_REPORT
         SetupDebugCallback();
@@ -621,6 +621,8 @@ namespace Walnut {
 
         PickPhysicalDevice();
         CreateLogicalDevice();
+        volkLoadDevice(g_Device);
+
         CreateDescriptorPool();
 
         // Create Framebuffers

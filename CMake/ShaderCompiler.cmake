@@ -1,14 +1,6 @@
 # https://stackoverflow.com/a/60472877
 # Utility function to compile shaders to SPIR-V bytecode
 
-find_package(Vulkan COMPONENTS glslc)
-find_program(glslc_executable NAMES glslc HINTS Vulkan::glslc)
-
-#if (NOT Vulkan_glslc_FOUND)
-#    message(WARNING "Check your Vulkan SDK installation. glslc is installed by default")
-#    message(FATAL_ERROR "Please install shaderc to compile shaders.")
-#endif()
-
 function(compile_shader target)
     cmake_parse_arguments(PARSE_ARGV 1 arg "" "ENV;FORMAT" "SOURCES")
     foreach(source ${arg_SOURCES})
@@ -17,7 +9,7 @@ function(compile_shader target)
             DEPENDS ${source}
             DEPFILE ${source}.d
             COMMAND
-                ${glslc_executable}
+                glslc_exe
                 $<$<BOOL:${arg_ENV}>:--target-env=${arg_ENV}>
                 $<$<BOOL:${arg_FORMAT}>:-mfmt=${arg_FORMAT}>
                 -MD -MF ${source}.d
