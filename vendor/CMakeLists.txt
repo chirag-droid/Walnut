@@ -96,8 +96,13 @@ set_property(TARGET glfw PROPERTY FOLDER "Vendor")
 # glm
 add_subdirectory(glm)
 
+# fmt
+add_subdirectory(fmt)
+
 # spdlog
 add_subdirectory(spdlog)
+option(SPDLOG_FMT_EXTERNAL "Use external fmt library instead of bundled" ON)
+option(SPDLOG_FMT_EXTERNAL_HO "Use external fmt header-only library instead of bundled" ON)
 set_property(TARGET spdlog PROPERTY FOLDER "Vendor")
 
 if (WALNUT_BUILD_EXAMPLES)
