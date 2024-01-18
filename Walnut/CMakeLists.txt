@@ -25,6 +25,7 @@ target_link_libraries(Walnut
         Vulkan::Vulkan
         ImGui
         glfw
+        shaderc
     PRIVATE
         spdlog::spdlog_header_only
 )
