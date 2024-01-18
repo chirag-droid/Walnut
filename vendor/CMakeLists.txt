@@ -100,43 +100,45 @@ add_subdirectory(glm)
 add_subdirectory(spdlog)
 set_property(TARGET spdlog PROPERTY FOLDER "Vendor")
 
-# glslang
-option(ENABLE_SPVREMAPPER OFF)
-option(ENABLE_GLSLANG_BINARIES OFF)
-set(ENABLE_HLSL ON)
-option(ENABLE_OPT OFF)
-option(BUILD_TESTING OFF)
-option(BUILD_EXTERNAL OFF)
+if (WALNUT_BUILD_EXAMPLES)
+    # glslang
+    option(ENABLE_SPVREMAPPER OFF)
+    option(ENABLE_GLSLANG_BINARIES OFF)
+    set(ENABLE_HLSL ON)
+    option(ENABLE_OPT OFF)
+    option(BUILD_TESTING OFF)
+    option(BUILD_EXTERNAL OFF)
 
-add_subdirectory(glslang)
+    add_subdirectory(glslang)
 
-set_target_properties(glslang PROPERTIES FOLDER "Vendor")
-set_target_properties(OGLCompiler PROPERTIES FOLDER "Vendor")
-set_target_properties(OSDependent PROPERTIES FOLDER "Vendor")
-set_target_properties(SPIRV PROPERTIES FOLDER "Vendor")
-set_target_properties(HLSL PROPERTIES FOLDER "Vendor")
+    set_target_properties(glslang PROPERTIES FOLDER "Vendor")
+    set_target_properties(OGLCompiler PROPERTIES FOLDER "Vendor")
+    set_target_properties(OSDependent PROPERTIES FOLDER "Vendor")
+    set_target_properties(SPIRV PROPERTIES FOLDER "Vendor")
+    set_target_properties(HLSL PROPERTIES FOLDER "Vendor")
 
-# Spirv-Tools
-add_subdirectory(spirv-headers)
+    # Spirv-Tools
+    add_subdirectory(spirv-headers)
 
-set(SKIP_SPIRV_TOOLS_INSTALL ON)
-set(SPIRV_SKIP_EXECUTABLES ON)
-set(SPIRV_SKIP_TESTS ON)
+    set(SKIP_SPIRV_TOOLS_INSTALL ON)
+    set(SPIRV_SKIP_EXECUTABLES ON)
+    set(SPIRV_SKIP_TESTS ON)
 
-add_subdirectory(spirv-tools)
+    add_subdirectory(spirv-tools)
 
-set_target_properties(SPIRV-Tools-opt PROPERTIES FOLDER "Vendor")
+    set_target_properties(SPIRV-Tools-opt PROPERTIES FOLDER "Vendor")
 
-# ShaderC
-set(SHADERC_SKIP_EXAMPLES ON)
-set(SHADERC_SKIP_TESTS ON)
-set(SHADERC_SKIP_COPYRIGHT_CHECK ON)
-set(SHADERC_SKIP_INSTALL ON)
-set(SHADERC_ENABLE_SHARED_CRT ON)
-add_subdirectory(shaderc)
+    # ShaderC
+    set(SHADERC_SKIP_EXAMPLES ON)
+    set(SHADERC_SKIP_TESTS ON)
+    set(SHADERC_SKIP_COPYRIGHT_CHECK ON)
+    set(SHADERC_SKIP_INSTALL ON)
+    set(SHADERC_ENABLE_SHARED_CRT ON)
+    add_subdirectory(shaderc)
 
-set_target_properties(shaderc PROPERTIES FOLDER "Vendor")
-set_target_properties(shaderc_util PROPERTIES FOLDER "Vendor")
-set_target_properties(shaderc_shared PROPERTIES FOLDER "Vendor")
-set_target_properties(glslc PROPERTIES FOLDER "Vendor")
-set_target_properties(glslc_exe PROPERTIES FOLDER "Vendor")
+    set_target_properties(shaderc PROPERTIES FOLDER "Vendor")
+    set_target_properties(shaderc_util PROPERTIES FOLDER "Vendor")
+    set_target_properties(shaderc_shared PROPERTIES FOLDER "Vendor")
+    set_target_properties(glslc PROPERTIES FOLDER "Vendor")
+    set_target_properties(glslc_exe PROPERTIES FOLDER "Vendor")
+endif()

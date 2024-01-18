@@ -51,8 +51,7 @@ namespace Walnut {
 
         // Create the Image
         {
-            VkImageCreateInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+            VkImageCreateInfo info = {VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
             info.imageType = VK_IMAGE_TYPE_2D;
             info.format = vulkanFormat;
             info.extent.width = m_Width;
@@ -67,8 +66,7 @@ namespace Walnut {
             CheckVkResult(err);
             VkMemoryRequirements req;
             vkGetImageMemoryRequirements(device, m_Image, &req);
-            VkMemoryAllocateInfo alloc_info = {};
-            alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+            VkMemoryAllocateInfo alloc_info = {VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO};
             alloc_info.allocationSize = req.size;
             alloc_info.memoryTypeIndex = Utils::GetVulkanMemoryType(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, req.memoryTypeBits);
             err = vkAllocateMemory(device, &alloc_info, nullptr, &m_Memory);
@@ -79,8 +77,7 @@ namespace Walnut {
 
         // Create the Image View:
         {
-            VkImageViewCreateInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            VkImageViewCreateInfo info = {VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
             info.image = m_Image;
             info.viewType = VK_IMAGE_VIEW_TYPE_2D;
             info.format = vulkanFormat;
@@ -96,8 +93,7 @@ namespace Walnut {
 
         // Create sampler:
         {
-            VkSamplerCreateInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+            VkSamplerCreateInfo info = {VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO};
             info.magFilter = VK_FILTER_LINEAR;
             info.minFilter = VK_FILTER_LINEAR;
             info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
