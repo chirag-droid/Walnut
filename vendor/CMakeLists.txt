@@ -1,64 +1,5 @@
-# Enables or disable Vulkan WSI extensions based on build system
-add_library(platform_wsi INTERFACE)
-if(WIN32)
-    target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_WIN32_KHR)
-elseif(APPLE)
-    target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_METAL_EXT)
-    if (IOS)
-        target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_IOS_MVK)
-    endif()
-    if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-        target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_MACOS_MVK)
-    endif()
-elseif(UNIX)
-    find_package(PkgConfig REQUIRED QUIET) # Use PkgConfig to find Linux system libraries
-
-    if(VK_WSI_SELECTION STREQUAL XCB)
-        pkg_check_modules(XCB REQUIRED QUIET IMPORTED_TARGET xcb)
-        target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_XCB_KHR)
-        target_link_libraries(platform_wsi INTERFACE PkgConfig::XCB)
-    endif()
-    if(VK_WSI_SELECTION STREQUAL X11)
-        pkg_check_modules(X11 REQUIRED QUIET IMPORTED_TARGET x11)
-        target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_XLIB_KHR VK_USE_PLATFORM_XLIB_XRANDR_EXT)
-        target_link_libraries(platform_wsi INTERFACE PkgConfig::X11)
-    endif()
-    if(VK_WSI_SELECTION STREQUAL WAYLAND)
-        target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_WAYLAND_KHR)
-    endif()
-    if(VK_WSI_SELECTION STREQUAL DirectFB)
-        pkg_check_modules(DirectFB QUIET REQUIRED IMPORTED_TARGET directfb)
-        target_compile_definitions(platform_wsi INTERFACE VK_USE_PLATFORM_DIRECTFB_EXT)
-        target_link_libraries(platform_wsi INTERFACE PkgConfig::DirectFB)
-    endif()
-else()
-    message(FATAL_ERROR "Unsupported Platform!")
-endif()
-
-# Vulkan Header Files
-set(VULKAN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/vulkan/include)
-add_library(vulkan INTERFACE ${VULKAN_DIR}/vulkan/vulkan.h)
-target_include_directories(vulkan INTERFACE ${VULKAN_DIR})
-
-target_compile_definitions(vulkan INTERFACE VK_NO_PROTOTYPES)
-target_link_libraries(vulkan INTERFACE platform_wsi)
-
-set_target_properties(vulkan PROPERTIES FOLDER "Vendor")
-
-# Volk - Vulkan Loader
-set(VOLK_DIR "${CMAKE_CURRENT_SOURCE_DIR}/volk")
-set(VOLK_FILES
-    "${VOLK_DIR}/volk.c"
-    "${VOLK_DIR}/volk.h")
-
-add_library(volk STATIC ${VOLK_FILES})
-target_include_directories(volk PUBLIC ${VOLK_DIR})
-target_link_libraries(volk PUBLIC vulkan)
-
-set_target_properties(volk PROPERTIES FOLDER "Vendor")
-
 # Dear ImGui
-add_library(ImGui STATIC)
+add_library(ImGui INTERFACE)
 
 set(IMGUI_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ImGui)
 set(IMGUI_SOURCES
@@ -76,11 +17,8 @@ set(IMGUI_SOURCES
 )
 list(TRANSFORM IMGUI_SOURCES PREPEND ${IMGUI_DIR}/)
 
-target_sources(ImGui PRIVATE ${IMGUI_SOURCES})
-target_include_directories(ImGui PUBLIC ${IMGUI_DIR})
-target_link_libraries(ImGui PRIVATE glfw volk)
-
-target_compile_definitions(ImGui PRIVATE IMGUI_IMPL_VULKAN_NO_PROTOTYPES)
+target_sources(ImGui INTERFACE ${IMGUI_SOURCES})
+target_include_directories(ImGui INTERFACE ${IMGUI_DIR})
 
 set_target_properties(ImGui PROPERTIES FOLDER "Vendor")
 

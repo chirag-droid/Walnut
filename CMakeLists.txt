@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.16)
 
 project(Walnut VERSION 0.1 DESCRIPTION "A fork of StudioCherno/Walnut application framework")
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake" ${CMAKE_MODULE_PATH})
-
 set(CMAKE_CXX_STANDARD_REQUIRED 17)
 set(CMAKE_CXX_STANDARD 17)
 

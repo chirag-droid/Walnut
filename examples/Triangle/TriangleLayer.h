@@ -12,7 +12,8 @@ class TriangleLayer : public Walnut::Layer {
 public:
     TriangleLayer() : m_Device(VK_NULL_HANDLE) {}
     void Render();
-    VkShaderModule CreateShaderModule(const std::vector<char>& code);
+    VkShaderModule CreateShaderModule(const std::vector<uint32_t>& shaderCode);
+    std::vector<uint32_t> TriangleLayer::CompileShader(const std::string& filename);
     void CreateRenderPass();
     void CreateGraphicsPipeline();
     void CreateFramebuffer();

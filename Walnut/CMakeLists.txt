@@ -3,6 +3,14 @@ set(CPP_FILES Application.cpp Image.cpp Random.cpp)
 
 add_library(Walnut STATIC ${HEADER_FILES} ${CPP_FILES} ${IMGUI_SOURCES})
 
+find_package(Vulkan)
+
+# if Vulkan not found prompt the user to install it
+if (NOT Vulkan_FOUND)
+    message(FATAL_ERROR "Please install Vulkan SDK. https://vulkan.lunarg.com/sdk/home")
+endif()
+
+
 target_include_directories(Walnut
     PUBLIC
         ${Walnut_SOURCE_DIR}
@@ -14,7 +22,7 @@ target_include_directories(Walnut
 target_link_libraries(Walnut
     PUBLIC
         glm::glm
-        volk
+        Vulkan::Vulkan
         ImGui
         glfw
     PRIVATE

@@ -3,7 +3,9 @@
 
 #include "imgui.h"
 #include "Walnut/Timer.h"
+#include "shaderc/shaderc.hpp"
 
+#include <string>
 #include <array>
 
 void TriangleLayer::OnAttach() {
@@ -40,7 +42,7 @@ void TriangleLayer::OnUIRender() {
     m_ViewportHeight = ImGui::GetContentRegionAvail().y;
 
     if (m_Image) {
-        ImGui::Image(m_Image->GetDescriptorSet(), {(float)m_Image->GetWidth(), (float)m_Image->GetHeight()});
+        ImGui::Image(reinterpret_cast<ImTextureID>(m_Image->GetDescriptorSet()), {(float)m_Image->GetWidth(), (float)m_Image->GetHeight()});
     }
 
     ImGui::End();
@@ -105,10 +107,10 @@ void TriangleLayer::Render() {
     m_LastRenderTime = timer.ElapsedMillis();
 }
 
-VkShaderModule TriangleLayer::CreateShaderModule(const std::vector<char>& code) {
+VkShaderModule TriangleLayer::CreateShaderModule(const std::vector<uint32_t>& shaderCode) {
     VkShaderModuleCreateInfo createInfo{VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO};
-    createInfo.codeSize = code.size();
-    createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+    createInfo.codeSize = shaderCode.size() * sizeof(uint32_t);
+    createInfo.pCode = shaderCode.data();;
 
     VkShaderModule shaderModule;
     if (vkCreateShaderModule(m_Device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
@@ -153,9 +155,8 @@ void TriangleLayer::CreateRenderPass() {
 
 void TriangleLayer::CreateGraphicsPipeline()
 {
-    // Load shader files to memory and bind to shader module
-    auto vertShaderCode = ReadFile("shaders/shader.vert.bin");
-    auto fragShaderCode = ReadFile("shaders/shader.frag.bin");
+    auto vertShaderCode = CompileShader("shaders/shader.vert");
+    auto fragShaderCode = CompileShader("shaders/shader.frag");
 
     VkShaderModule vertShaderModule = CreateShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = CreateShaderModule(fragShaderCode);
@@ -276,4 +277,23 @@ void TriangleLayer::CreateFramebuffer() {
     if (vkCreateFramebuffer(m_Device, &framebufferInfo, nullptr, &m_Framebuffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to create framebuffer!");
     }
+}
+
+std::vector<uint32_t> TriangleLayer::CompileShader(const std::string& filename) {
+    shaderc::Compiler compiler;
+    shaderc::CompileOptions options;
+
+    auto shaderCode = ReadFile(filename);
+    auto result = compiler.CompileGlslToSpv(
+        std::string{shaderCode.begin(), shaderCode.end()},
+        shaderc_glsl_infer_from_source,
+        filename.data(),
+        options
+    );
+
+    if (result.GetCompilationStatus() != shaderc_compilation_status_success) {
+        throw std::runtime_error(result.GetErrorMessage());
+    }
+
+    return std::vector(result.cbegin(), result.cend());
 }
